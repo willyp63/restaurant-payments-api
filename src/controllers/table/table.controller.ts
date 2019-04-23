@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
 import { TableService } from 'services/table/table.service';
 import { Table } from 'models/table.model';
 import { TableItem } from 'models/table-item.model';
@@ -6,26 +6,36 @@ import { TableItem } from 'models/table-item.model';
 @Controller('table')
 export class TableController {
   constructor(
-    private readonly _tableService: TableService,
+    private readonly tableService: TableService,
   ) {}
 
   @Get('all')
   getTable(): Promise<Table[]> {
-    return this._tableService.getTables();
+    return this.tableService.getTables();
   }
 
   @Get(':id')
   getTableById(@Param('id') tableId: string): Promise<Table> {
-    return this._tableService.getTableById(tableId);
+    return this.tableService.getTableById(tableId);
+  }
+
+  @Patch(':id')
+  updateTableWithId(@Param('id') tableId: string, @Body() table: Table): Promise<Table> {
+    return this.tableService.updateTableWithId(tableId, table);
   }
 
   @Post('new')
-  addTable(@Body() table: Table): Promise<void> {
-    return this._tableService.addTable(table);
+  addTable(@Body() table: Table): Promise<Table> {
+    return this.tableService.addTable(table);
   }
 
   @Post(':id/add-item')
-  addItemToTable(@Param('id') tableId: string, @Body() item: TableItem): Promise<void> {
-    return this._tableService.addItemToTable(tableId, item);
+  addItemToTable(@Param('id') tableId: string, @Body() item: TableItem): Promise<TableItem> {
+    return this.tableService.addItemToTable(tableId, item);
+  }
+
+  @Delete(':id')
+  removeTable(@Param('id') tableId: string): Promise<void> {
+    return this.tableService.removeTable(tableId);
   }
 }
