@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
-import { TableService } from 'services/table/table.service';
-import { Table } from 'models/table.model';
-import { TableItem } from 'models/table-item.model';
+import { TableService } from '../../services/table/table.service';
+import { Table } from '../../models/table.model';
+import { TableItem } from '../../models/table-item.model';
 
 @Controller('table')
 export class TableController {

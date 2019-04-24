@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from 'services/database/database.service';
+import { DatabaseService } from '../../services/database/database.service';
 import { Collection, Db, ObjectId } from 'mongodb';
-import { TableItem } from 'models/table-item.model';
-import { TABLE_ITEM_COLLECTION_NAME } from 'constants/collection.constants';
+import { TableItem } from '../../models/table-item.model';
+import { TABLE_ITEM_COLLECTION_NAME } from '../../constants/collection.constants';
 
 @Injectable()
 export class TableItemService {

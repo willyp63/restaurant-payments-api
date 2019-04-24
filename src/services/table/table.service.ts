@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from 'services/database/database.service';
+import { DatabaseService } from '../../services/database/database.service';
 import { Db, Collection, ObjectId, InsertOneWriteOpResult } from 'mongodb';
-import { Table } from 'models/table.model';
-import { TableItem } from 'models/table-item.model';
-import { addCreatedAtField } from 'utils/created-at.util';
-import { addIdField } from 'utils/id.utils';
-import { TABLE_COLLECTION_NAME, TABLE_ITEM_COLLECTION_NAME } from 'constants/collection.constants';
+import { Table } from '../../models/table.model';
+import { TableItem } from '../../models/table-item.model';
+import { addCreatedAtField } from '../../utils/created-at.util';
+import { addIdField } from '../../utils/id.utils';
+import { TABLE_COLLECTION_NAME, TABLE_ITEM_COLLECTION_NAME } from '../../constants/collection.constants';
 
 @Injectable()
 export class TableService {

@@ -1,6 +1,6 @@
 import { Controller, Patch, Param, Body, Delete } from '@nestjs/common';
-import { TableItem } from 'models/table-item.model';
-import { TableItemService } from 'services/table-item/table-item.service';
+import { TableItem } from '../../models/table-item.model';
+import { TableItemService } from '../../services/table-item/table-item.service';
 
 @Controller('table-item')
 export class TableItemController {
