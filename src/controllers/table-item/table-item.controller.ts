@@ -1,6 +1,7 @@
 import { Controller, Patch, Param, Body, Delete } from '@nestjs/common';
 import { TableItem } from '../../models/table-item.model';
 import { TableItemService } from '../../services/table-item/table-item.service';
+import { ObjectId } from 'mongodb';
 
 @Controller('table-item')
 export class TableItemController {
@@ -9,12 +10,12 @@ export class TableItemController {
   ) {}
 
   @Patch(':id')
-  updateTableWithId(@Param('id') itemId: string, @Body() item: TableItem): Promise<TableItem> {
+  updateTableWithId(@Param('id') itemId: ObjectId, @Body() item: Partial<TableItem>): Promise<void> {
     return this.tableItemService.updateTableItemWithId(itemId, item);
   }
 
   @Delete(':id')
-  removeTable(@Param('id') itemId: string): Promise<void> {
+  removeTableItem(@Param('id') itemId: ObjectId): Promise<void> {
     return this.tableItemService.removeTableItem(itemId);
   }
 }

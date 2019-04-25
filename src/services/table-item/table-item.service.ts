@@ -10,30 +10,39 @@ export class TableItemService {
     private readonly databaseService: DatabaseService,
   ) {}
 
-  updateTableItemWithId(itemId: string, item: TableItem): Promise<TableItem> {
+  updateTableItemWithId(itemId: ObjectId, item: Partial<TableItem>): Promise<void> {
     return new Promise((resolve) => {
       this._getTableItemCollection().then((collection: Collection<TableItem>) => {
         collection.updateOne(
-          { _id: new ObjectId(itemId) },
+          { _id: itemId },
           { $set: item },
-        ).then(() => resolve(item));
+        ).then(() => resolve());
       });
     });
   }
 
-  removeTableItem(itemId: string): Promise<void> {
+  removeTableItem(itemId: ObjectId): Promise<void> {
     return new Promise((resolve) => {
       this._getTableItemCollection().then((collection: Collection<TableItem>) => {
-        collection.deleteOne({ _id: new ObjectId(itemId) }).then(() => resolve());
+        collection.deleteOne({ _id: itemId }).then(() => resolve());
+      });
+    });
+  }
+
+  payForTableItem(itemId: ObjectId): Promise<void> {
+    return new Promise((resolve) => {
+      this._getTableItemCollection().then((collection: Collection<TableItem>) => {
+        collection.updateOne(
+          { _id: itemId },
+          { $set: { paidFor: true } },
+        ).then(() => resolve());
       });
     });
   }
 
   private _getTableItemCollection(): Promise<Collection<TableItem>> {
     return new Promise((resolve) => {
-      this.databaseService.getDB().then((db: Db) => {
-        resolve(db.collection(TABLE_ITEM_COLLECTION_NAME));
-      });
+      this.databaseService.getDB().then((db: Db) => resolve(db.collection(TABLE_ITEM_COLLECTION_NAME)));
     });
   }
 }

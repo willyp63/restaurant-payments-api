@@ -3,8 +3,6 @@ import { DatabaseService } from '../../services/database/database.service';
 import { Db, Collection, ObjectId, InsertOneWriteOpResult } from 'mongodb';
 import { Table } from '../../models/table.model';
 import { TableItem } from '../../models/table-item.model';
-import { addCreatedAtField } from '../../utils/created-at.util';
-import { addIdField } from '../../utils/id.utils';
 import { TABLE_COLLECTION_NAME, TABLE_ITEM_COLLECTION_NAME } from '../../constants/collection.constants';
 
 @Injectable()
@@ -18,9 +16,7 @@ export class TableService {
     return new Promise((resolve) => {
       this._getTableCollection().then((collection: Collection<Table>) => {
         collection.insertOne(table).then((op: InsertOneWriteOpResult) => {
-          addIdField(table, op.insertedId);
-          addCreatedAtField(table);
-          resolve(table);
+          resolve({ ...table, _id: op.insertedId });
         });
       });
     });
@@ -30,20 +26,18 @@ export class TableService {
     return new Promise((resolve) => {
       this._getTableCollection().then((collection: Collection<Table>) => {
         collection.find().toArray().then((tables: Table[]) => {
-          tables.forEach(addCreatedAtField);
           resolve(tables);
         });
       });
     });
   }
 
-  getTableById(tableId: string): Promise<Table> {
+  getTableById(tableId: ObjectId): Promise<Table> {
     return new Promise((resolve) => {
       this._getTableCollection().then((tableCollection: Collection<Table>) => {
-        tableCollection.findOne({ _id: new ObjectId(tableId) }).then((table: Table) => {
+        tableCollection.findOne({ _id: tableId }).then((table: Table) => {
           this._getTableItemCollection().then((tableItemCollection: Collection<Table>) => {
-            tableItemCollection.find({ table_id: new ObjectId(tableId) }).toArray().then((items: TableItem[]) => {
-              addCreatedAtField(table);
+            tableItemCollection.find({ tableId }).toArray().then((items: TableItem[]) => {
               resolve({ ...table, items });
             });
           });
@@ -52,34 +46,33 @@ export class TableService {
     });
   }
 
-  updateTableWithId(tableId: string, table: Table): Promise<Table> {
+  updateTableWithId(tableId: ObjectId, table: Partial<Table>): Promise<void> {
     return new Promise((resolve) => {
       this._getTableCollection().then((tableCollection: Collection<Table>) => {
         tableCollection.updateOne(
-          { _id: new ObjectId(tableId) },
+          { _id: tableId },
           { $set: table },
-        ).then(() => resolve(table));
+        ).then(() => resolve());
       });
     });
   }
 
-  addItemToTable(tableId: string, item: TableItem): Promise<TableItem> {
+  addItemToTable(tableId: ObjectId, item: TableItem): Promise<TableItem> {
     return new Promise((resolve) => {
       this._getTableItemCollection().then((collection: Collection<TableItem>) => {
-        collection.insertOne({ ...item, table_id: new ObjectId(tableId) }).then((op: InsertOneWriteOpResult) => {
-          addIdField(item, op.insertedId);
-          resolve(item);
+        collection.insertOne({ ...item, tableId }).then((op: InsertOneWriteOpResult) => {
+          resolve({ ...item, _id: op.insertedId });
         });
       });
     });
   }
 
-  removeTable(tableId: string): Promise<void> {
+  removeTable(tableId: ObjectId): Promise<void> {
     return new Promise((resolve) => {
       this._getTableCollection().then((tableCollection: Collection<Table>) => {
-        tableCollection.deleteOne({ _id: new ObjectId(tableId) }).then(() => {
+        tableCollection.deleteOne({ _id: tableId }).then(() => {
           this._getTableItemCollection().then((itemCollection: Collection<TableItem>) => {
-            itemCollection.deleteMany({ table_id: new ObjectId(tableId) }).then(() => resolve());
+            itemCollection.deleteMany({ tableId }).then(() => resolve());
           });
         });
       });
@@ -88,17 +81,13 @@ export class TableService {
 
   private _getTableCollection(): Promise<Collection<Table>> {
     return new Promise((resolve) => {
-      this.databaseService.getDB().then((db: Db) => {
-        resolve(db.collection(TABLE_COLLECTION_NAME));
-      });
+      this.databaseService.getDB().then((db: Db) => resolve(db.collection(TABLE_COLLECTION_NAME)));
     });
   }
 
   private _getTableItemCollection(): Promise<Collection<TableItem>> {
     return new Promise((resolve) => {
-      this.databaseService.getDB().then((db: Db) => {
-        resolve(db.collection(TABLE_ITEM_COLLECTION_NAME));
-      });
+      this.databaseService.getDB().then((db: Db) => resolve(db.collection(TABLE_ITEM_COLLECTION_NAME)));
     });
   }
 }
