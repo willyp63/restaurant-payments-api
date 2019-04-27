@@ -15,6 +15,8 @@ export class PaymentGateway {
 
   @SubscribeMessage('pay_for_item')
   handleMessage(client: any, itemPay: TableItemPay) {
+    console.log('MESSAGE RECIVED');
+
     this.tableItemService.payForTableItem(new ObjectId(itemPay.tableItemId)).then(() => {
       this.server.emit('item_paid_for', itemPay);
     });
