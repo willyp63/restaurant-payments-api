@@ -1,42 +1,44 @@
 import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
-import { TableService } from '../../services/table/table.service';
-import { Table } from '../../models/table.model';
-import { TableItem } from '../../models/table-item.model';
 import { ObjectId } from 'mongodb';
+
+import { TableService } from '../../services/table/table.service';
+import { TableItemService } from '../../services/table-item/table-item.service';
+import { Table, TableItem } from '../../models';
 
 @Controller('table')
 export class TableController {
   constructor(
     private readonly tableService: TableService,
+    private readonly tableItemService: TableItemService,
   ) {}
 
   @Get('/')
   getTable(): Promise<Table[]> {
-    return this.tableService.getTables();
+    return this.tableService.getAll();
   }
 
   @Get(':id')
   getTableById(@Param('id') tableId: ObjectId): Promise<Table> {
-    return this.tableService.getTableById(tableId);
+    return this.tableService.get(tableId);
   }
 
   @Patch(':id')
   updateTableWithId(@Param('id') tableId: ObjectId, @Body() table: Partial<Table>): Promise<void> {
-    return this.tableService.updateTableWithId(tableId, table);
+    return this.tableService.update(tableId, table);
   }
 
   @Post('/')
   addTable(@Body() table: Table): Promise<Table> {
-    return this.tableService.addTable(table);
+    return this.tableService.add(table);
   }
 
   @Post(':id/add-item')
   addItemToTable(@Param('id') tableId: ObjectId, @Body() item: TableItem): Promise<TableItem> {
-    return this.tableService.addItemToTable(tableId, item);
+    return this.tableItemService.add(item, tableId);
   }
 
   @Delete(':id')
   removeTable(@Param('id') tableId: ObjectId): Promise<void> {
-    return this.tableService.removeTable(tableId);
+    return this.tableService.remove(tableId);
   }
 }

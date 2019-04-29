@@ -4,6 +4,6 @@ export type MongoId = ObjectId | string;
 
 export class MongoEntity {
   // tslint:disable-next-line:variable-name
-  _id: MongoId;
+  _id?: MongoId;
   createdAt?: string;
 }

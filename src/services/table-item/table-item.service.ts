@@ -1,18 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
+
+import { CRUDService } from '../../abstract/crud-service.abstract';
 import { DatabaseService } from '../../services/database/database.service';
-import { Collection, Db, ObjectId } from 'mongodb';
-import { TableItem } from '../../models/table-item.model';
-import { TABLE_ITEM_COLLECTION_NAME } from '../../constants/collection.constants';
+import { TableItem } from '../../models';
 
 @Injectable()
-export class TableItemService {
+export class TableItemService implements CRUDService<TableItem> {
   constructor(
     private readonly databaseService: DatabaseService,
   ) {}
 
-  updateTableItemWithId(itemId: ObjectId, item: Partial<TableItem>): Promise<void> {
+  add(item: TableItem, tableId: ObjectId): Promise<TableItem> {
     return new Promise((resolve) => {
-      this._getTableItemCollection().then((collection: Collection<TableItem>) => {
+      this.databaseService.getTableItemCollection().then(collection => {
+        collection.insertOne({ ...item, tableId }).then(insertOp => {
+          resolve({ ...item, _id: insertOp.insertedId });
+        });
+      });
+    });
+  }
+
+  update(itemId: ObjectId, item: Partial<TableItem>): Promise<void> {
+    return new Promise((resolve) => {
+      this.databaseService.getTableItemCollection().then(collection => {
         collection.updateOne(
           { _id: itemId },
           { $set: item },
@@ -21,28 +32,27 @@ export class TableItemService {
     });
   }
 
-  removeTableItem(itemId: ObjectId): Promise<void> {
+  remove(itemId: ObjectId): Promise<void> {
     return new Promise((resolve) => {
-      this._getTableItemCollection().then((collection: Collection<TableItem>) => {
+      this.databaseService.getTableItemCollection().then(collection => {
         collection.deleteOne({ _id: itemId }).then(() => resolve());
       });
     });
   }
 
-  payForTableItem(itemId: ObjectId): Promise<void> {
+  getAllByTableId(tableId: ObjectId): Promise<TableItem[]> {
     return new Promise((resolve) => {
-      this._getTableItemCollection().then((collection: Collection<TableItem>) => {
-        collection.updateOne(
-          { _id: itemId },
-          { $set: { paidFor: true } },
-        ).then(() => resolve());
+      this.databaseService.getTableItemCollection().then(collection => {
+        collection.find({ tableId }).toArray().then(() => resolve());
       });
     });
   }
 
-  private _getTableItemCollection(): Promise<Collection<TableItem>> {
+  removeAllByTableId(tableId: ObjectId): Promise<void> {
     return new Promise((resolve) => {
-      this.databaseService.getDB().then((db: Db) => resolve(db.collection(TABLE_ITEM_COLLECTION_NAME)));
+      this.databaseService.getTableItemCollection().then(collection => {
+        collection.deleteMany({ tableId }).then(() => resolve());
+      });
     });
   }
 }

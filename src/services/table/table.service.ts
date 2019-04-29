@@ -1,54 +1,63 @@
 import { Injectable } from '@nestjs/common';
+import { ObjectId, InsertOneWriteOpResult } from 'mongodb';
+
+import { CRUDService } from '../../abstract/crud-service.abstract';
 import { DatabaseService } from '../../services/database/database.service';
-import { Db, Collection, ObjectId, InsertOneWriteOpResult } from 'mongodb';
-import { Table } from '../../models/table.model';
-import { TableItem } from '../../models/table-item.model';
-import { TABLE_COLLECTION_NAME, TABLE_ITEM_COLLECTION_NAME } from '../../constants/collection.constants';
+import { TableItemService } from '../../services/table-item/table-item.service';
+import { Table } from '../../models';
+import { TABLE_ITEM_COLLECTION_NAME } from 'constants/collection.constants';
 
 @Injectable()
-export class TableService {
+export class TableService implements CRUDService<Table> {
 
   constructor(
     private readonly databaseService: DatabaseService,
-  ) {}
+    private readonly tableItemService: TableItemService,
+  ) { }
 
-  addTable(table: Table): Promise<Table> {
+  get(tableId: ObjectId): Promise<Table> {
     return new Promise((resolve) => {
-      this._getTableCollection().then((collection: Collection<Table>) => {
-        collection.insertOne(table).then((op: InsertOneWriteOpResult) => {
-          resolve({ ...table, _id: op.insertedId });
-        });
+      this.databaseService.getTableCollection().then(tableCollection => {
+        tableCollection.aggregate([
+          {
+            $match: { _id: tableId },
+          },
+          {
+            $lookup: {
+              from: TABLE_ITEM_COLLECTION_NAME,
+              localField: '_id',
+              foreignField: 'tableId',
+              as: 'items',
+            },
+          },
+        ]).toArray().then(tables => resolve(tables[0]));
       });
     });
   }
 
-  getTables(): Promise<Table[]> {
+  getAll(): Promise<Table[]> {
     return new Promise((resolve) => {
-      this._getTableCollection().then((collection: Collection<Table>) => {
-        collection.find().toArray().then((tables: Table[]) => {
+      this.databaseService.getTableCollection().then(tableCollection => {
+        tableCollection.find().toArray().then((tables: Table[]) => {
           resolve(tables);
         });
       });
     });
   }
 
-  getTableById(tableId: ObjectId): Promise<Table> {
+  add(table: Table): Promise<Table> {
     return new Promise((resolve) => {
-      this._getTableCollection().then((tableCollection: Collection<Table>) => {
-        tableCollection.findOne({ _id: tableId }).then((table: Table) => {
-          this._getTableItemCollection().then((tableItemCollection: Collection<Table>) => {
-            tableItemCollection.find({ tableId }).toArray().then((items: TableItem[]) => {
-              resolve({ ...table, items });
-            });
-          });
+      this.databaseService.getTableCollection().then(tableCollection => {
+        tableCollection.insertOne(table).then((op: InsertOneWriteOpResult) => {
+          resolve({ ...table, _id: op.insertedId });
         });
       });
     });
   }
 
-  updateTableWithId(tableId: ObjectId, table: Partial<Table>): Promise<void> {
+  update(tableId: ObjectId, table: Partial<Table>): Promise<void> {
     return new Promise((resolve) => {
-      this._getTableCollection().then((tableCollection: Collection<Table>) => {
+      this.databaseService.getTableCollection().then(tableCollection => {
         tableCollection.updateOne(
           { _id: tableId },
           { $set: table },
@@ -57,37 +66,14 @@ export class TableService {
     });
   }
 
-  addItemToTable(tableId: ObjectId, item: TableItem): Promise<TableItem> {
+  remove(tableId: ObjectId): Promise<void> {
     return new Promise((resolve) => {
-      this._getTableItemCollection().then((collection: Collection<TableItem>) => {
-        collection.insertOne({ ...item, tableId }).then((op: InsertOneWriteOpResult) => {
-          resolve({ ...item, _id: op.insertedId });
-        });
-      });
-    });
-  }
-
-  removeTable(tableId: ObjectId): Promise<void> {
-    return new Promise((resolve) => {
-      this._getTableCollection().then((tableCollection: Collection<Table>) => {
+      // TODO: do these 2 lookups in parallel instead of series
+      this.databaseService.getTableCollection().then(tableCollection => {
         tableCollection.deleteOne({ _id: tableId }).then(() => {
-          this._getTableItemCollection().then((itemCollection: Collection<TableItem>) => {
-            itemCollection.deleteMany({ tableId }).then(() => resolve());
-          });
+          this.tableItemService.removeAllByTableId(tableId).then(() => resolve());
         });
       });
-    });
-  }
-
-  private _getTableCollection(): Promise<Collection<Table>> {
-    return new Promise((resolve) => {
-      this.databaseService.getDB().then((db: Db) => resolve(db.collection(TABLE_COLLECTION_NAME)));
-    });
-  }
-
-  private _getTableItemCollection(): Promise<Collection<TableItem>> {
-    return new Promise((resolve) => {
-      this.databaseService.getDB().then((db: Db) => resolve(db.collection(TABLE_ITEM_COLLECTION_NAME)));
     });
   }
 }

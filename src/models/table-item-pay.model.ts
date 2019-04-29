@@ -1,9 +1,7 @@
-import { MongoId } from './mongo-entity.model';
-import { IsNotEmpty } from 'class-validator';
-import { Expose } from 'class-transformer';
+import { MongoId, MongoEntity } from './mongo-entity.model';
 
-export class TableItemPay {
-  @Expose()
-  @IsNotEmpty()
-  tableItemId: MongoId;
+export class TableItemPay extends MongoEntity {
+  userId: MongoId;
+  tableId: MongoId;
+  tableItemIds: MongoId[];
 }

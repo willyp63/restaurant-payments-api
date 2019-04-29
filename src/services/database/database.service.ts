@@ -1,5 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { Db, MongoClient } from 'mongodb';
+import { Db, MongoClient, Collection } from 'mongodb';
+
+import {
+  TableItemPay,
+  TableItem,
+  TableJoin,
+  Table,
+  User,
+} from '../../models';
+import {
+  TABLE_ITEM_COLLECTION_NAME,
+  TABLE_ITEM_PAY_COLLECTION_NAME,
+  TABLE_JOIN_COLLECTION_NAME,
+  TABLE_COLLECTION_NAME,
+  USER_COLLECTION_NAME,
+} from '../../constants/collection.constants';
 
 const DB_NAME = process.env.MONGODB_URI ? '' : 'restaurant-payments';
 const DB_BASE_URL =  process.env.MONGODB_URI || 'mongodb://localhost:27017';
@@ -16,4 +31,16 @@ export class DatabaseService {
   getDB(): Promise<Db> {
     return this.db;
   }
+
+  getCollection<T>(collectionName: string): Promise<Collection<T>> {
+    return new Promise((resolve) => {
+      this.getDB().then((db: Db) => resolve(db.collection(collectionName)));
+    });
+  }
+
+  getTableItemPayCollection() { return this.getCollection<TableItemPay>(TABLE_ITEM_PAY_COLLECTION_NAME); }
+  getTableItemCollection() { return this.getCollection<TableItem>(TABLE_ITEM_COLLECTION_NAME); }
+  getTableJoinCollection() { return this.getCollection<TableJoin>(TABLE_JOIN_COLLECTION_NAME); }
+  getTableCollection() { return this.getCollection<Table>(TABLE_COLLECTION_NAME); }
+  getUserCollection() { return this.getCollection<User>(USER_COLLECTION_NAME); }
 }
