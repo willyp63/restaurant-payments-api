@@ -7,13 +7,9 @@ import { TableItem, User, TableItemPay } from '../../models';
 
 @Controller('table-item')
 export class TableItemController {
-  constructor(
-    private readonly tableItemService: TableItemService,
-    private readonly tableItemPayService: TableItemPayService,
-  ) {}
-
+  
   @Patch(':id')
-  updateTableWithId(@Param('id') itemId: ObjectId, @Body() item: Partial<TableItem>): Promise<void> {
+  updateTableItem(@Param('id') itemId: ObjectId, @Body() item: Partial<TableItem>): Promise<void> {
     return this.tableItemService.update(itemId, item);
   }
 
@@ -22,8 +18,14 @@ export class TableItemController {
     return this.tableItemService.remove(itemId);
   }
 
+  /* --- Payments ---*/
   @Post(':id/pay')
   payForTableItem(@Param('id') itemId: ObjectId, @Body() user: Partial<User>): Promise<TableItemPay> {
-    return this.tableItemPayService.add({ tableItemId: itemId, userId: new ObjectId(user._id) });
+    return this.tableItemPayService.payForItem(itemId, new ObjectId(user._id));
   }
+
+  constructor(
+    private readonly tableItemService: TableItemService,
+    private readonly tableItemPayService: TableItemPayService,
+  ) {}
 }

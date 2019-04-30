@@ -8,38 +8,45 @@ import { Table, TableItem, User, TableJoin } from '../../models';
 
 @Controller('table')
 export class TableController {
-  constructor(
-    private readonly tableService: TableService,
-    private readonly tableItemService: TableItemService,
-    private readonly tableJoinService: TableJoinService,
-  ) {}
 
-  @Get('/')
-  getTable(): Promise<Table[]> {
+  @Get()
+  getAllTables(): Promise<Table[]> {
     return this.tableService.getAll();
   }
 
   @Get(':id')
-  getTableById(@Param('id') tableId: ObjectId): Promise<Table> {
+  getTable(@Param('id') tableId: ObjectId): Promise<Table> {
     return this.tableService.get(tableId);
   }
 
-  @Patch(':id')
-  updateTableWithId(@Param('id') tableId: ObjectId, @Body() table: Partial<Table>): Promise<void> {
-    return this.tableService.update(tableId, table);
-  }
-
-  @Post('/')
+  @Post()
   addTable(@Body() table: Table): Promise<Table> {
     return this.tableService.add(table);
   }
 
-  @Post(':id/add-item')
+  @Patch(':id')
+  updateTable(@Param('id') tableId: ObjectId, @Body() table: Partial<Table>): Promise<void> {
+    return this.tableService.update(tableId, table);
+  }
+
+  @Delete(':id')
+  removeTable(@Param('id') tableId: ObjectId): Promise<void> {
+    return this.tableService.remove(tableId);
+  }
+
+  /* --- Table Items --- */
+  @Post(':id/items')
   addItemToTable(@Param('id') tableId: ObjectId, @Body() item: TableItem): Promise<TableItem> {
     return this.tableItemService.add(item, tableId);
   }
 
-  @Post(':id/add-user')
+  @Get(':id/items')
+  getAllTableItems(@Param('id') tableId: ObjectId): Promise<TableItem[]> {
+    return this.tableItemService.getAllByTableId(tableId);
+  }
+
+  /* --- Table Users --- */
+  @Post(':id/users')
   addUserToTable(@Param('id') tableId: ObjectId, @Body() user: Partial<User>): Promise<TableJoin> {
     return this.tableJoinService.addUserToTable(new ObjectId(user._id), tableId);
   }
@@ -49,8 +56,9 @@ export class TableController {
     return this.tableJoinService.getAllUsersAtTable(tableId);
   }
 
-  @Delete(':id')
-  removeTable(@Param('id') tableId: ObjectId): Promise<void> {
-    return this.tableService.remove(tableId);
-  }
+  constructor(
+    private readonly tableService: TableService,
+    private readonly tableItemService: TableItemService,
+    private readonly tableJoinService: TableJoinService,
+  ) {}
 }

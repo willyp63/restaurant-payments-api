@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PaymentGateway } from './payment.gateway';
+import { TableJoinGateway } from './table-join.gateway';
 
-describe('PaymentGateway', () => {
-  let gateway: PaymentGateway;
+describe('TableJoinGateway', () => {
+  let gateway: TableJoinGateway;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PaymentGateway],
+      providers: [TableJoinGateway],
     }).compile();
 
-    gateway = module.get<PaymentGateway>(PaymentGateway);
+    gateway = module.get<TableJoinGateway>(TableJoinGateway);
   });
 
   it('should be defined', () => {
