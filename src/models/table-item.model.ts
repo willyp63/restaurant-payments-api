@@ -11,6 +11,5 @@ export class TableItem extends MongoEntity {
   @IsNotEmpty()
   price: number;
 
-  paidFor?: boolean;
   tableId?: MongoId;
 }

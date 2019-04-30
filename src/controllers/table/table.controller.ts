@@ -3,13 +3,15 @@ import { ObjectId } from 'mongodb';
 
 import { TableService } from '../../services/table/table.service';
 import { TableItemService } from '../../services/table-item/table-item.service';
-import { Table, TableItem } from '../../models';
+import { TableJoinService } from '../../services/table-join/table-join.service';
+import { Table, TableItem, User, TableJoin } from '../../models';
 
 @Controller('table')
 export class TableController {
   constructor(
     private readonly tableService: TableService,
     private readonly tableItemService: TableItemService,
+    private readonly tableJoinService: TableJoinService,
   ) {}
 
   @Get('/')
@@ -35,6 +37,16 @@ export class TableController {
   @Post(':id/add-item')
   addItemToTable(@Param('id') tableId: ObjectId, @Body() item: TableItem): Promise<TableItem> {
     return this.tableItemService.add(item, tableId);
+  }
+
+  @Post(':id/add-user')
+  addUserToTable(@Param('id') tableId: ObjectId, @Body() user: Partial<User>): Promise<TableJoin> {
+    return this.tableJoinService.addUserToTable(new ObjectId(user._id), tableId);
+  }
+
+  @Get(':id/users')
+  getAllUsersAtTable(@Param('id') tableId: ObjectId): Promise<TableJoin[]> {
+    return this.tableJoinService.getAllUsersAtTable(tableId);
   }
 
   @Delete(':id')

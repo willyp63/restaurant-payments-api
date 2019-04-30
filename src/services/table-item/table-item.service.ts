@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { CRUDService } from '../../abstract/crud-service.abstract';
 import { DatabaseService } from '../../services/database/database.service';
 import { TableItem } from '../../models';
+import { TABLE_ITEM_PAY_COLLECTION_NAME, USER_COLLECTION_NAME, TABLE_ITEM_COLLECTION_NAME } from '../../constants/collection.constants';
 
 @Injectable()
 export class TableItemService implements CRUDService<TableItem> {
@@ -43,7 +44,59 @@ export class TableItemService implements CRUDService<TableItem> {
   getAllByTableId(tableId: ObjectId): Promise<TableItem[]> {
     return new Promise((resolve) => {
       this.databaseService.getTableItemCollection().then(collection => {
-        collection.find({ tableId }).toArray().then(() => resolve());
+        collection.aggregate([
+          {
+            $match: { tableId },
+          },
+          {
+            $lookup: {
+              from: TABLE_ITEM_PAY_COLLECTION_NAME,
+              localField: '_id',
+              foreignField: 'tableItemId',
+              as: 'itemPay',
+            },
+          },
+          {
+            $addFields: {
+              itemPay: { $arrayElemAt: ['$itemPay', 0] },
+            }
+          },
+          {
+            $lookup: {
+              from: USER_COLLECTION_NAME,
+              localField: 'itemPay.userId',
+              foreignField: '_id',
+              as: 'payingUser',
+            },
+          },
+          {
+            $addFields: {
+              paidForAt: { $toDate: '$itemPay._id' },
+              paidForBy: {
+                $let: {
+                  vars: {
+                    payingUser: { $arrayElemAt: ['$payingUser', 0] },
+                  },
+                  in: {
+                    firstName: '$$payingUser.firstName',
+                    lastName: '$$payingUser.lastName',
+                  },
+                },
+              },
+            },
+          },
+          {
+            $project: {
+              _id: '$_id',
+              name: '$name',
+              price: '$price',
+              paidForAt: '$paidForAt',
+              paidForBy: '$paidForBy',
+            },
+          },
+        ]).toArray().then(items => resolve(items));
+
+        //collection.find({ tableId }).toArray().then(() => resolve());
       });
     });
   }

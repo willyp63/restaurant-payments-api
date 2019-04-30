@@ -5,7 +5,6 @@ import { CRUDService } from '../../abstract/crud-service.abstract';
 import { DatabaseService } from '../../services/database/database.service';
 import { TableItemService } from '../../services/table-item/table-item.service';
 import { Table } from '../../models';
-import { TABLE_ITEM_COLLECTION_NAME } from 'constants/collection.constants';
 
 @Injectable()
 export class TableService implements CRUDService<Table> {
@@ -18,19 +17,11 @@ export class TableService implements CRUDService<Table> {
   get(tableId: ObjectId): Promise<Table> {
     return new Promise((resolve) => {
       this.databaseService.getTableCollection().then(tableCollection => {
-        tableCollection.aggregate([
-          {
-            $match: { _id: tableId },
-          },
-          {
-            $lookup: {
-              from: TABLE_ITEM_COLLECTION_NAME,
-              localField: '_id',
-              foreignField: 'tableId',
-              as: 'items',
-            },
-          },
-        ]).toArray().then(tables => resolve(tables[0]));
+        tableCollection.findOne({ _id: tableId}).then(table => {
+          this.tableItemService.getAllByTableId(tableId).then(items => {
+            resolve({ ...table, items });
+          });
+        });
       });
     });
   }
