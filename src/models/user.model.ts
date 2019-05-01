@@ -1,6 +1,8 @@
 import { IsNotEmpty, IsEmail } from 'class-validator';
 import { Expose } from 'class-transformer';
-import { MongoEntity } from './mongo-entity.model';
+
+import { MongoEntity, MongoDate } from './mongo-entity.model';
+import { TableItem } from './table-item.model';
 
 export class User extends MongoEntity {
   @Expose()
@@ -19,4 +21,7 @@ export class User extends MongoEntity {
   @Expose()
   @IsNotEmpty()
   password: string;
+
+  joinedTableAt?: MongoDate;
+  paidForItems?: TableItem[];
 }

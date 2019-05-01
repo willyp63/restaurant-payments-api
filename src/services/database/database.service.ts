@@ -9,15 +9,14 @@ import {
   User,
 } from '../../models';
 import {
+  DB_BASE_URL,
+  DB_NAME,
   TABLE_ITEM_COLLECTION_NAME,
   TABLE_ITEM_PAY_COLLECTION_NAME,
   TABLE_JOIN_COLLECTION_NAME,
   TABLE_COLLECTION_NAME,
   USER_COLLECTION_NAME,
 } from '../../constants/collection.constants';
-
-const DB_NAME = process.env.MONGODB_URI ? '' : 'restaurant-payments';
-const DB_BASE_URL =  process.env.MONGODB_URI || 'mongodb://localhost:27017';
 
 @Injectable()
 export class DatabaseService {
