@@ -46,7 +46,7 @@ export class TableJoinService {
           {
             $project: {
               _id: '$user._id',
-              joinTableAt: { $toDate: '$_id' },
+              joinedTableAt: { $toDate: '$_id' },
               firstName: '$user.firstName',
               lastName: '$user.lastName',
             },

@@ -17,11 +17,7 @@ export class TableService implements CRUDService<Table> {
   get(tableId: ObjectId): Promise<Table> {
     return new Promise((resolve) => {
       this.databaseService.getTableCollection().then(tableCollection => {
-        tableCollection.findOne({ _id: tableId}).then(table => {
-          this.tableItemService.getAllByTableId(tableId).then(items => {
-            resolve({ ...table, items });
-          });
-        });
+        tableCollection.findOne({ _id: tableId}).then(table => resolve(table));
       });
     });
   }

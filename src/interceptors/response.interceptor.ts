@@ -20,8 +20,7 @@ export class ResponseInterceptor implements NestInterceptor {
     if (!entity._id) { return entity; }
 
     const objectId = entity._id instanceof ObjectId ? entity._id : new ObjectId(entity._id);
-    const createdAtDate = objectId.getTimestamp();
-    entity.createdAt = createdAtDate.toLocaleDateString() + ' @ ' + createdAtDate.toLocaleTimeString();
+    entity.createdAt = objectId.getTimestamp();
     return entity;
   }
 }
