@@ -23,5 +23,6 @@ export class User extends MongoEntity {
   password: string;
 
   joinedTableAt?: MongoDate;
+  leftTableAt?: MongoDate;
   paidForItems?: TableItem[];
 }

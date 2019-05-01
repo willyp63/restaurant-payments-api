@@ -52,8 +52,13 @@ export class TableController {
   }
 
   @Get(':id/users')
-  getAllUsersAtTable(@Param('id') tableId: ObjectId): Promise<TableJoin[]> {
+  getAllUsersAtTable(@Param('id') tableId: ObjectId): Promise<User[]> {
     return this.tableJoinService.getAllUsersAtTable(tableId);
+  }
+
+  @Get(':id/users-that-left')
+  getAllUsersThatLeftTable(@Param('id') tableId: ObjectId): Promise<User[]> {
+    return this.tableJoinService.getAllUsersThatLeftTable(tableId);
   }
 
   constructor(

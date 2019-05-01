@@ -7,6 +7,7 @@ import {
   TableJoin,
   Table,
   User,
+  TableLeave,
 } from '../../models';
 import {
   DB_BASE_URL,
@@ -14,6 +15,7 @@ import {
   TABLE_ITEM_COLLECTION_NAME,
   TABLE_ITEM_PAY_COLLECTION_NAME,
   TABLE_JOIN_COLLECTION_NAME,
+  TABLE_LEAVE_COLLECTION_NAME,
   TABLE_COLLECTION_NAME,
   USER_COLLECTION_NAME,
 } from '../../constants/collection.constants';
@@ -40,6 +42,7 @@ export class DatabaseService {
   getTableItemPayCollection() { return this.getCollection<TableItemPay>(TABLE_ITEM_PAY_COLLECTION_NAME); }
   getTableItemCollection() { return this.getCollection<TableItem>(TABLE_ITEM_COLLECTION_NAME); }
   getTableJoinCollection() { return this.getCollection<TableJoin>(TABLE_JOIN_COLLECTION_NAME); }
+  getTableLeaveCollection() { return this.getCollection<TableLeave>(TABLE_LEAVE_COLLECTION_NAME); }
   getTableCollection() { return this.getCollection<Table>(TABLE_COLLECTION_NAME); }
   getUserCollection() { return this.getCollection<User>(USER_COLLECTION_NAME); }
 }
