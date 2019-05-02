@@ -3,8 +3,9 @@ import { ObjectId } from 'mongodb';
 
 import { TableItemService } from '../../services/table-item/table-item.service';
 import { TableItem } from '../../models';
+import { ROUTE_NAMES } from '../../constants/route-names.constants';
 
-@Controller('table-item')
+@Controller(ROUTE_NAMES.TableItems)
 export class TableItemController {
   
   // TODO: move to gateway, so updates are broadcast to all users
@@ -16,4 +17,5 @@ export class TableItemController {
   constructor(
     private readonly tableItemService: TableItemService,
   ) {}
+  
 }

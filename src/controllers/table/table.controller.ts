@@ -5,8 +5,9 @@ import { TableService } from '../../services/table/table.service';
 import { TableItemService } from '../../services/table-item/table-item.service';
 import { UserService } from '../../services/user/user.service';
 import { Table, TableItem, User } from '../../models';
+import { ROUTE_NAMES } from '../../constants/route-names.constants';
 
-@Controller('table')
+@Controller(ROUTE_NAMES.Tables)
 export class TableController {
 
   @Get()
@@ -34,12 +35,12 @@ export class TableController {
     return this.tableService.remove(tableId);
   }
 
-  @Get(':id/items')
+  @Get(`:id/${ROUTE_NAMES.TableItems}`)
   getAllTableItems(@Param('id') tableId: ObjectId): Promise<TableItem[]> {
     return this.tableItemService.getAllByTableId(tableId);
   }
 
-  @Get(':id/users')
+  @Get(`:id/${ROUTE_NAMES.Users}`)
   getAllUsersAtTable(@Param('id') tableId: ObjectId): Promise<User[]> {
     return this.userService.getAllUsersAtTable(tableId);
   }
@@ -49,4 +50,5 @@ export class TableController {
     private readonly tableItemService: TableItemService,
     private readonly userService: UserService,
   ) {}
+  
 }

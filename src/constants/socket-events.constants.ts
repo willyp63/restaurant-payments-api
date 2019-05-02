@@ -1,4 +1,4 @@
-export const SOCKET_MESSAGES = {
+export const SOCKET_EVENTS = {
   /* Users */
   JoinTable: 'join_table',
   UserJoinedTable: 'user_joined_table',

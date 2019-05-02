@@ -3,8 +3,9 @@ import { ObjectId } from 'mongodb';
 
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../models';
+import { ROUTE_NAMES } from '../../constants/route-names.constants';
 
-@Controller('user')
+@Controller(ROUTE_NAMES.Users)
 export class UserController {
   
   @Get()
@@ -25,4 +26,5 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
   ) {}
+  
 }
