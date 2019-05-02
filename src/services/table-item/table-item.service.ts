@@ -5,6 +5,7 @@ import { CRUDService } from '../../abstract/crud-service.abstract';
 import { DatabaseService } from '../../services/database/database.service';
 import { TableItem } from '../../models';
 import { COLLECTION_NAMES } from '../../constants/collection.constants';
+import { idToDate } from '../../utils/date.utils';
 
 @Injectable()
 export class TableItemService implements CRUDService<TableItem> {
@@ -87,10 +88,9 @@ export class TableItemService implements CRUDService<TableItem> {
             },
           },
         ]).toArray().then((items: any[]) => {
-          console.log(items);
           resolve(items.map(item => ({
             ...item,
-            paidForAt: (item.paidForAt as ObjectId).getTimestamp(),
+            paidForAt: idToDate(item.paidForAt),
           })));
         });
       });

@@ -5,6 +5,7 @@ import { CRUDService } from '../../abstract/crud-service.abstract';
 import { DatabaseService } from '../../services/database/database.service';
 import { User } from '../../models';
 import { COLLECTION_NAMES } from '../../constants/collection.constants';
+import { idToDate } from '../../utils/date.utils';
 
 @Injectable()
 export class UserService implements CRUDService<User> {
@@ -125,11 +126,10 @@ export class UserService implements CRUDService<User> {
             },
           },
         ]).toArray().then((users: any[]) => {
-          console.log(users);
           resolve(users.map(user => ({
             ...user,
-            joinedTableAt: (user.joinedTableAt as ObjectId).getTimestamp(),
-            leftTableAt: (user.leftTableAt as ObjectId).getTimestamp(),
+            joinedTableAt: idToDate(user.joinedTableAt),
+            leftTableAt: idToDate(user.leftTableAt),
           })));
         });
       });
