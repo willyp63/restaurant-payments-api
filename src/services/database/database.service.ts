@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Db, MongoClient, Collection } from 'mongodb';
 
+import { DB_BASE_URL, DB_NAME } from '../../constants/db.constants';
+import { COLLECTION_NAMES } from '../../constants/collection.constants';
 import {
   TableItemPay,
   TableItem,
@@ -9,19 +11,10 @@ import {
   User,
   TableLeave,
 } from '../../models';
-import {
-  DB_BASE_URL,
-  DB_NAME,
-  TABLE_ITEM_COLLECTION_NAME,
-  TABLE_ITEM_PAY_COLLECTION_NAME,
-  TABLE_JOIN_COLLECTION_NAME,
-  TABLE_LEAVE_COLLECTION_NAME,
-  TABLE_COLLECTION_NAME,
-  USER_COLLECTION_NAME,
-} from '../../constants/collection.constants';
 
 @Injectable()
 export class DatabaseService {
+
   private db: Promise<Db> = new Promise((resolve) => {
     MongoClient.connect(DB_BASE_URL, { useNewUrlParser: true }, (err, client) => {
       if (err) { throw err; }
@@ -29,20 +22,17 @@ export class DatabaseService {
     });
   });
 
-  getDB(): Promise<Db> {
-    return this.db;
-  }
-
   getCollection<T>(collectionName: string): Promise<Collection<T>> {
     return new Promise((resolve) => {
-      this.getDB().then((db: Db) => resolve(db.collection(collectionName)));
+      this.db.then((db: Db) => resolve(db.collection(collectionName)));
     });
   }
 
-  getTableItemPayCollection() { return this.getCollection<TableItemPay>(TABLE_ITEM_PAY_COLLECTION_NAME); }
-  getTableItemCollection() { return this.getCollection<TableItem>(TABLE_ITEM_COLLECTION_NAME); }
-  getTableJoinCollection() { return this.getCollection<TableJoin>(TABLE_JOIN_COLLECTION_NAME); }
-  getTableLeaveCollection() { return this.getCollection<TableLeave>(TABLE_LEAVE_COLLECTION_NAME); }
-  getTableCollection() { return this.getCollection<Table>(TABLE_COLLECTION_NAME); }
-  getUserCollection() { return this.getCollection<User>(USER_COLLECTION_NAME); }
+  getTableItemPayCollection = () => this.getCollection<TableItemPay>(COLLECTION_NAMES.TableItemPays);
+  getTableItemCollection = () => this.getCollection<TableItem>(COLLECTION_NAMES.TableItems);
+  getTableJoinCollection = () => this.getCollection<TableJoin>(COLLECTION_NAMES.TableJoins);
+  getTableLeaveCollection = () => this.getCollection<TableLeave>(COLLECTION_NAMES.TableLeaves);
+  getTableCollection = () => this.getCollection<Table>(COLLECTION_NAMES.Tables);
+  getUserCollection = () => this.getCollection<User>(COLLECTION_NAMES.Users);
+  
 }

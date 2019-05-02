@@ -3,8 +3,8 @@ import { ObjectId } from 'mongodb';
 
 import { TableService } from '../../services/table/table.service';
 import { TableItemService } from '../../services/table-item/table-item.service';
-import { TableJoinService } from '../../services/table-join/table-join.service';
-import { Table, TableItem, User, TableJoin } from '../../models';
+import { UserService } from '../../services/user/user.service';
+import { Table, TableItem, User } from '../../models';
 
 @Controller('table')
 export class TableController {
@@ -34,36 +34,19 @@ export class TableController {
     return this.tableService.remove(tableId);
   }
 
-  /* --- Table Items --- */
-  @Post(':id/items')
-  addItemToTable(@Param('id') tableId: ObjectId, @Body() item: TableItem): Promise<TableItem> {
-    return this.tableItemService.add(item, tableId);
-  }
-
   @Get(':id/items')
   getAllTableItems(@Param('id') tableId: ObjectId): Promise<TableItem[]> {
     return this.tableItemService.getAllByTableId(tableId);
   }
 
-  /* --- Table Users --- */
-  @Post(':id/users')
-  addUserToTable(@Param('id') tableId: ObjectId, @Body() user: Partial<User>): Promise<TableJoin> {
-    return this.tableJoinService.addUserToTable(new ObjectId(user._id), tableId);
-  }
-
   @Get(':id/users')
   getAllUsersAtTable(@Param('id') tableId: ObjectId): Promise<User[]> {
-    return this.tableJoinService.getAllUsersAtTable(tableId);
-  }
-
-  @Get(':id/users-that-left')
-  getAllUsersThatLeftTable(@Param('id') tableId: ObjectId): Promise<User[]> {
-    return this.tableJoinService.getAllUsersThatLeftTable(tableId);
+    return this.userService.getAllUsersAtTable(tableId);
   }
 
   constructor(
     private readonly tableService: TableService,
     private readonly tableItemService: TableItemService,
-    private readonly tableJoinService: TableJoinService,
+    private readonly userService: UserService,
   ) {}
 }

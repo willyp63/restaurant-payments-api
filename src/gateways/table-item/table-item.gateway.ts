@@ -3,31 +3,41 @@ import { Server } from 'socket.io';
 import { ObjectId } from 'mongodb';
 
 import { TableItemService } from '../../services/table-item/table-item.service';
-import { ADD_TABLE_ITEM, TABLE_ITEM_ADDED, REMOVE_TABLE_ITEM, TABLE_ITEM_REMOVED } from '../../constants/socket-messages.constants';
-import { TableItem } from '../../models';
+import { SOCKET_MESSAGES } from '../../constants/socket-messages.constants';
+import { TableItem, TableItemPay } from '../../models';
 
 @WebSocketGateway()
 export class TableItemGateway {
-  constructor(
-    private readonly tableItemService: TableItemService,
-  ) {}
 
   @WebSocketServer()
   server: Server;
 
-  @SubscribeMessage(ADD_TABLE_ITEM)
+  @SubscribeMessage(SOCKET_MESSAGES.AddTableItem)
   handleAddTableItem(client: any, payload: TableItem) {
     this.tableItemService.add(payload, new ObjectId(payload.tableId)).then(() => {
-      // TODO: only emit to client at table
-      this.server.emit(TABLE_ITEM_ADDED, {});
+      // TODO: only emit to clients at table
+      this.server.emit(SOCKET_MESSAGES.TableItemAdded, {});
     });
   }
 
-  @SubscribeMessage(REMOVE_TABLE_ITEM)
+  @SubscribeMessage(SOCKET_MESSAGES.RemoveTableItem)
   handleRemoveTableItem(client: any, payload: TableItem) {
     this.tableItemService.remove(new ObjectId(payload._id)).then(() => {
-      // TODO: only emit to client at table
-      this.server.emit(TABLE_ITEM_REMOVED, {});
+      // TODO: only emit to clients at table
+      this.server.emit(SOCKET_MESSAGES.TableItemRemoved, {});
     });
   }
+
+  @SubscribeMessage(SOCKET_MESSAGES.PayForTableItem)
+  handlePayForTableItem(client: any, payload: TableItemPay) {
+    this.tableItemService.payForItem(new ObjectId(payload.tableItemId), new ObjectId(payload.userId)).then(() => {
+      // TODO: only emit to clients at table
+      this.server.emit(SOCKET_MESSAGES.TableItemPaidFor, {});
+    });
+  }
+
+  constructor(
+    private readonly tableItemService: TableItemService,
+  ) {}
+
 }
