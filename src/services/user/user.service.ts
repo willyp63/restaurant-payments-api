@@ -117,14 +117,20 @@ export class UserService implements CRUDService<User> {
           {
             $project: {
               _id: '$_id',
-              joinedTableAt: { $convert: { input: '$tableJoinId', to: "date" } },
-              leftTableAt: { $convert: { input: '$tableLeaveId', to: "date" } },
+              joinedTableAt: '$tableJoinId', // converted to date below
+              leftTableAt: '$tableLeaveId', // converted to date below
               firstName: '$firstName',
               lastName: '$lastName',
               paidForItems: '$paidForItems',
             },
           },
-        ]).toArray().then((users: any[]) => resolve(users));
+        ]).toArray().then((users: any[]) => {
+          resolve(users.map(user => ({
+            ...user,
+            joinedTableAt: (user.joinedTableAt as ObjectId).getTimestamp(),
+            leftTableAt: (user.leftTableAt as ObjectId).getTimestamp(),
+          })));
+        });
       });
     });
   }

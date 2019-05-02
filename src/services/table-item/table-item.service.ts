@@ -78,7 +78,7 @@ export class TableItemService implements CRUDService<TableItem> {
               _id: '$_id',
               name: '$name',
               price: '$price',
-              paidForAt: { $convert: { input: '$itemPay._id', to: "date" } },
+              paidForAt: '$itemPay._id', // converted to date below
               paidForBy: {
                 _id: '$payingUser._id',
                 firstName: '$payingUser.firstName',
@@ -86,7 +86,12 @@ export class TableItemService implements CRUDService<TableItem> {
               },
             },
           },
-        ]).toArray().then(items => resolve(items));
+        ]).toArray().then((items: any[]) => {
+          resolve(items.map(item => ({
+            ...item,
+            paidForAt: (item.paidForAt as ObjectId).getTimestamp(),
+          })));
+        });
       });
     });
   }
