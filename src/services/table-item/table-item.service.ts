@@ -87,6 +87,7 @@ export class TableItemService implements CRUDService<TableItem> {
             },
           },
         ]).toArray().then((items: any[]) => {
+          console.log(items);
           resolve(items.map(item => ({
             ...item,
             paidForAt: (item.paidForAt as ObjectId).getTimestamp(),

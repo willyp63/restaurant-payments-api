@@ -125,6 +125,7 @@ export class UserService implements CRUDService<User> {
             },
           },
         ]).toArray().then((users: any[]) => {
+          console.log(users);
           resolve(users.map(user => ({
             ...user,
             joinedTableAt: (user.joinedTableAt as ObjectId).getTimestamp(),
