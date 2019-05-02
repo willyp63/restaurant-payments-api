@@ -117,8 +117,8 @@ export class UserService implements CRUDService<User> {
           {
             $project: {
               _id: '$_id',
-              joinedTableAt: { $toDate: '$tableJoinId' },
-              leftTableAt: { $toDate: '$tableLeaveId' },
+              joinedTableAt: { $convert: { input: '$tableJoinId', to: "date" } },
+              leftTableAt: { $convert: { input: '$tableLeaveId', to: "date" } },
               firstName: '$firstName',
               lastName: '$lastName',
               paidForItems: '$paidForItems',

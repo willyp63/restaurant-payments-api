@@ -78,7 +78,7 @@ export class TableItemService implements CRUDService<TableItem> {
               _id: '$_id',
               name: '$name',
               price: '$price',
-              paidForAt: { $toDate: '$itemPay._id' },
+              paidForAt: { $convert: { input: '$itemPay._id', to: "date" } },
               paidForBy: {
                 _id: '$payingUser._id',
                 firstName: '$payingUser.firstName',
