@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Server } from 'socket.io';
 
 import { TableJoin } from '../../models';
-import { SOCKET_MESSAGES } from 'constants/socket-messages.constants';
+import { SOCKET_MESSAGES } from '../../constants/socket-messages.constants';
 import { UserService } from '../../services/user/user.service';
 
 @WebSocketGateway()
