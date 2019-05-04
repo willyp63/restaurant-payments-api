@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 
 import { UserService } from '../../services/user/user.service';
-import { User } from '../../models';
+import { User, Table } from '../../models';
 import { ROUTE_NAMES } from '../../constants/route-names.constants';
 
 @Controller(ROUTE_NAMES.Users)
@@ -16,6 +16,11 @@ export class UserController {
   @Get(':id')
   getUser(@Param('id') userId: ObjectId): Promise<User> {
     return this.userService.get(userId);
+  }
+
+  @Get(`:id/${ROUTE_NAMES.Tables}`)
+  getPastTablesForUser(@Param('id') userId: ObjectId): Promise<Table[]> {
+    return this.userService.getPastTablesForUser(userId);
   }
 
   @Post()

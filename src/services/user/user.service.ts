@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 
 import { CRUDService } from '../../abstract/crud-service.abstract';
 import { DatabaseService } from '../../services/database/database.service';
-import { User } from '../../models';
+import { User, Table } from '../../models';
 import { COLLECTION_NAMES } from '../../constants/collection.constants';
 import { idToDate } from '../../utils/date.utils';
 
@@ -12,7 +12,6 @@ export class UserService implements CRUDService<User> {
 
   add(user: User): Promise<User> {
     return new Promise(resolve => {
-      console.log(user);
       this.databaseService.getUserCollection().then(collection => {
         collection.insertOne(user).then(insertOp => {
           resolve({ ...user, _id: insertOp.insertedId, password: undefined });
@@ -131,6 +130,36 @@ export class UserService implements CRUDService<User> {
             joinedTableAt: idToDate(user.joinedTableAt),
             leftTableAt: idToDate(user.leftTableAt),
           })));
+        });
+      });
+    });
+  }
+
+  getPastTablesForUser(userId: ObjectId): Promise<Table[]> {
+    return new Promise(resolve => {
+      this.databaseService.getTableJoinCollection().then(collection => {
+        collection.aggregate([
+          // filter by [userId]
+          { $match: { userId } },
+          // join with [Table]s
+          {
+            $lookup: {
+              from: COLLECTION_NAMES.Tables,
+              localField: 'tableId',
+              foreignField: '_id',
+              as: 'table',
+            },
+          },
+          { $addFields: { table: { $arrayElemAt: ['$table', 0] } } },
+          // format as [Table]s
+          {
+            $project: {
+              _id: '$table._id',
+              name: '$table.name',
+            },
+          },
+        ]).toArray().then((tables: any[]) => {
+          resolve(tables as Table[]);
         });
       });
     });
