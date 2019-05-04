@@ -151,6 +151,7 @@ export class UserService implements CRUDService<User> {
             },
           },
           { $addFields: { table: { $arrayElemAt: ['$table', 0] } } },
+          { $match: { table: { $exists: true } } },
           // format as [Table]s
           {
             $project: {

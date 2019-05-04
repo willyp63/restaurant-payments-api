@@ -45,6 +45,11 @@ export class TableController {
     return this.userService.getAllUsersAtTable(tableId);
   }
 
+  @Post(`:id/${ROUTE_NAMES.Users}`)
+  addUserToTable(@Param('id') tableId: ObjectId, @Body() user: Partial<User>): Promise<void> {
+    return this.userService.addUserToTable(new ObjectId(user._id), tableId);
+  }
+
   constructor(
     private readonly tableService: TableService,
     private readonly tableItemService: TableItemService,
