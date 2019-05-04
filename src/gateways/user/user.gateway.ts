@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { TableJoin } from '../../models';
 import { SOCKET_EVENTS } from '../../constants/socket-events.constants';
 import { UserService } from '../../services/user/user.service';
-import { NativeWebSocketGateway } from 'gateways/native-websocket/native-websocket.gateway';
+import { NativeWebSocketGateway } from '../native-websocket/native-websocket.gateway';
 
 @WebSocketGateway()
 export class UserGateway extends NativeWebSocketGateway implements OnGatewayConnection {
