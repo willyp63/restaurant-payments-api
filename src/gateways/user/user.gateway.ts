@@ -1,16 +1,13 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { WebSocketGateway, OnGatewayConnection, SubscribeMessage} from '@nestjs/websockets';
 import { ObjectId } from 'mongodb';
-import { Server } from 'socket.io';
 
 import { TableJoin } from '../../models';
 import { SOCKET_EVENTS } from '../../constants/socket-events.constants';
 import { UserService } from '../../services/user/user.service';
+import { NativeWebSocketGateway } from 'gateways/native-websocket/native-websocket.gateway';
 
 @WebSocketGateway()
-export class UserGateway {
-
-  @WebSocketServer()
-  server: Server;
+export class UserGateway extends NativeWebSocketGateway implements OnGatewayConnection {
 
   @SubscribeMessage(SOCKET_EVENTS.JoinTable)
   handleJoinTable(client: any, payload: TableJoin) {
@@ -19,7 +16,7 @@ export class UserGateway {
 
     this.userService.addUserToTable(new ObjectId(userId), new ObjectId(tableId)).then(() => {
       // TODO: only emit to client at table
-      this.server.emit(SOCKET_EVENTS.UserJoinedTable, {});
+      this.broadcast(SOCKET_EVENTS.UserJoinedTable, {});
     });
   }
 
@@ -30,12 +27,14 @@ export class UserGateway {
 
     this.userService.removeUserFromTable(new ObjectId(userId), new ObjectId(tableId)).then(() => {
       // TODO: only emit to client at table
-      this.server.emit(SOCKET_EVENTS.UserLeftTable, {});
+      this.broadcast(SOCKET_EVENTS.UserLeftTable, {});
     });
   }
 
   constructor(
     private readonly userService: UserService,
-  ) {}
+  ) {
+    super();
+  }
   
 }
