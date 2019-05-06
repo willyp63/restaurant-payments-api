@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, BadRequestException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 
 import { UserService } from '../../services/user/user.service';
@@ -15,7 +15,10 @@ export class UserController {
 
   @Get(':id')
   getUser(@Param('id') userId: ObjectId): Promise<User> {
-    return this.userService.get(userId);
+    return this.userService.get(userId).then(user => {
+      if (!user) { throw new BadRequestException('Invalid user'); }
+      return user;
+    });
   }
 
   @Get(`:id/${ROUTE_NAMES.Tables}`)

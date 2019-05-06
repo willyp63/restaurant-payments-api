@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Patch, BadRequestException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 
 import { TableService } from '../../services/table/table.service';
@@ -17,7 +17,10 @@ export class TableController {
 
   @Get(':id')
   getTable(@Param('id') tableId: ObjectId): Promise<Table> {
-    return this.tableService.get(tableId);
+    return this.tableService.get(tableId).then(table => {
+      if (!table) { throw new BadRequestException('Invalid table'); }
+      return table;
+    });
   }
 
   @Post()
