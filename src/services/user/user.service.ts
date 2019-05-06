@@ -39,7 +39,11 @@ export class UserService implements CRUDService<User> {
   addUserToTable(userId: ObjectId, tableId: ObjectId): Promise<void> {
     return new Promise(resolve => {
       this.databaseService.getTableJoinCollection().then(collection => {
-        collection.insertOne({ userId, tableId }).then(() => resolve());
+        collection.findOne({ userId, tableId }).then(tableJoin => {
+          if (!tableJoin) {
+            collection.insertOne({ userId, tableId }).then(() => resolve());
+          }
+        });
       });
     });
   }
@@ -48,9 +52,11 @@ export class UserService implements CRUDService<User> {
     return new Promise(resolve => {
       this.databaseService.getTableJoinCollection().then(joinCollection => {
         joinCollection.findOne({ userId, tableId }).then(tableJoin => {
-          this.databaseService.getTableLeaveCollection().then(leaveCollection => {
-            leaveCollection.insertOne({ tableJoinId: tableJoin._id }).then(() => resolve());
-          });
+          if (tableJoin) {
+            this.databaseService.getTableLeaveCollection().then(leaveCollection => {
+              leaveCollection.insertOne({ tableJoinId: tableJoin._id }).then(() => resolve());
+            });
+          }
         });
       });
     });
