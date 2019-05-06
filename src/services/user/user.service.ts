@@ -102,6 +102,8 @@ export class UserService implements CRUDService<User> {
             },
           },
           { $addFields: { paidForItem: { $arrayElemAt: ['$paidForItem', 0] } } },
+          // Only Items at table
+          { $match: { 'paidForItem.tableId': tableId } },
           // regroup and format as [User]s
           {
             $group: {
