@@ -32,8 +32,13 @@ export class UserController {
   }
 
   @Post('/login')
-  loginUser(@Body() user: Partial<User>): Promise<User> {
-    return this.userService.getByEmailAndPassword(user.email, user.password);
+  async loginUser(@Body() user: Partial<User>): Promise<User> {
+    const loggedInUser = await this.userService.getByEmailAndPassword(user.email, user.password);
+
+    if (!loggedInUser) {
+      throw new BadRequestException('Invalid credentials');
+    }
+    return loggedInUser;
   }
 
   constructor(
