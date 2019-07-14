@@ -36,6 +36,14 @@ export class UserService implements CRUDService<User> {
     });
   }
 
+  getByEmailAndPassword(userEmail: string, userPassword: String): Promise<User> {
+    return new Promise(resolve => {
+      this.databaseService.getUserCollection().then(collection => {
+        collection.findOne({ email: userEmail, password: userPassword }).then(user => resolve(user));
+      });
+    });
+  }
+
   addUserToTable(userId: ObjectId, tableId: ObjectId): Promise<void> {
     return new Promise(resolve => {
       this.databaseService.getTableJoinCollection().then(collection => {

@@ -31,6 +31,11 @@ export class UserController {
     return this.userService.add(user);
   }
 
+  @Post('/login')
+  loginUser(@Body() user: Partial<User>): Promise<User> {
+    return this.userService.getByEmailAndPassword(user.email, user.password);
+  }
+
   constructor(
     private readonly userService: UserService,
   ) {}
