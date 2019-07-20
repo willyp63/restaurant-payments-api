@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, BadRequestException, HttpCode } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 
 import { UserService } from '../../services/user/user.service';
@@ -31,6 +31,7 @@ export class UserController {
   }
 
   @Post('/login')
+  @HttpCode(200)
   async loginUser(@Body() user: Partial<User>): Promise<User> {
     const loggedInUser = await this.userService.getByEmailAndPassword(user.email, user.password);
 
