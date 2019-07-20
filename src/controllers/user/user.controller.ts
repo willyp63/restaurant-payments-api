@@ -7,7 +7,6 @@ import { ROUTE_NAMES } from '../../constants/route-names.constants';
 
 @Controller(ROUTE_NAMES.Users)
 export class UserController {
-  
   @Get()
   getAllUsers(): Promise<User[]> {
     return this.userService.getAll();
@@ -44,5 +43,4 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
   ) {}
-  
 }
