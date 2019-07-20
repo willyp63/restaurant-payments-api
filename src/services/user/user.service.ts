@@ -173,7 +173,7 @@ export class UserService implements CRUDService<User> {
             $project: {
               _id: '$table._id',
               name: '$table.name',
-              joinedAt: { $toDate: '$_id' },
+              joinedAt: { $convert: { input: '$_id', to: 'date' } },
             },
           },
         ]).toArray().then((tables: any[]) => {
