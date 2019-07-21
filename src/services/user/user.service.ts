@@ -173,11 +173,14 @@ export class UserService implements CRUDService<User> {
             $project: {
               _id: '$table._id',
               name: '$table.name',
-              joinedAt: { $convert: { input: '$_id', to: 'date' } },
+              joinedAt: '$_id',
             },
           },
         ]).toArray().then((tables: any[]) => {
-          resolve(tables as Table[]);
+          resolve(tables.map((table: any) => {
+            // Convert id to timestamp. (mongo 4.0 can do this in [aggregate], but heroku only supports 3.0)
+            return { ...table, joinedAt: (new ObjectId(table.joinedAt)).getTimestamp() };
+          }) as Table[]);
         });
       });
     });
