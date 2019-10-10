@@ -22,8 +22,8 @@ import { UserService } from './services/user/user.service';
   ],
   providers: [
     // Gateways
-    TableItemGateway,
-    UserGateway,
+    // TableItemGateway,
+    // UserGateway,
 
     // Services
     DatabaseService,
